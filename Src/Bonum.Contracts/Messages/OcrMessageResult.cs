@@ -2,10 +2,10 @@
 
 public class OcrMessageResult
 {
-    public string ImageText { get; private init; }
+    public string Text { get; private init; }
 
-    public OcrMessageResult(string imageText)
+    public OcrMessageResult(string text)
     {
-        ImageText = imageText;
+        Text = text;
     }
 }
