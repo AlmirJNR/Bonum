@@ -1,4 +1,5 @@
 using Bonum.Api.Clients;
+using Bonum.Api.Services;
 using Bonum.Contracts.Interfaces;
 using Bonum.Contracts.Messages;
 using Bonum.Shared.Extensions;
@@ -11,6 +12,7 @@ builder.Services.AddMassTransit(x =>
     x.UsingBonumRabbitMq(builder.Configuration);
 });
 builder.Services.AddTransient<IAmqpClient<OcrMessage, OcrMessageResult>, OcrClient>();
+builder.Services.AddTransient<IOcrService, OcrService>();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

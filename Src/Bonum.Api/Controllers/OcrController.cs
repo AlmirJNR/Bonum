@@ -1,5 +1,4 @@
 using Bonum.Contracts.Interfaces;
-using Bonum.Contracts.Messages;
 using Bonum.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +8,11 @@ namespace Bonum.Api.Controllers;
 [Route("[controller]")]
 public class OcrController : ControllerBase
 {
-    private readonly IAmqpClient<OcrMessage, OcrMessageResult> _ocrClient;
+    private readonly IOcrService _ocrService;
 
-    public OcrController(IAmqpClient<OcrMessage, OcrMessageResult> ocrClient)
+    public OcrController(IOcrService ocrService)
     {
-        _ocrClient = ocrClient;
+        _ocrService = ocrService;
     }
 
     [HttpGet]
@@ -25,10 +24,7 @@ public class OcrController : ControllerBase
         if (file.Length > FileConstants.TenMbInBytes)
             return BadRequest("File length is greater than 10 MB");
 
-        await using var memoryStream = new MemoryStream();
-        await file.CopyToAsync(memoryStream, cancellationToken);
-        var fileBytes = memoryStream.ToArray();
-        var response = await _ocrClient.Request(new OcrMessage(fileBytes), cancellationToken);
+        var response = await _ocrService.GetTextFromImage(file.OpenReadStream(), cancellationToken);
         return Ok(response);
     }
 }
