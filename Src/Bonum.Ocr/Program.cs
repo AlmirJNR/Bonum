@@ -1,5 +1,5 @@
 using System.Reflection;
-using Bonum.Shared;
+using Bonum.Shared.Extensions;
 using MassTransit;
 
 var builder = Host.CreateApplicationBuilder(args);

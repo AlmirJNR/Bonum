@@ -1,7 +1,7 @@
 using Bonum.Api.Clients;
 using Bonum.Contracts.Interfaces;
 using Bonum.Contracts.Messages;
-using Bonum.Shared;
+using Bonum.Shared.Extensions;
 using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -2,7 +2,7 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 
-namespace Bonum.Shared;
+namespace Bonum.Shared.Extensions;
 
 public static class MassTransitRabbitMqExtensions
 {
