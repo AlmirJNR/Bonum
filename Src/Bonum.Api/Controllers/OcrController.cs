@@ -1,4 +1,6 @@
+using Bonum.Contracts.Dtos;
 using Bonum.Contracts.Interfaces;
+using Bonum.Contracts.Messages;
 using Bonum.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,16 +17,27 @@ public class OcrController : ControllerBase
         _ocrService = ocrService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetImageText([FromForm] IFormFile file, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(OcrMessageResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpPost("image")]
+    public async Task<IActionResult> GetImageText(
+        [FromForm] WrapperDto<IFormFile> file,
+        CancellationToken cancellationToken
+    )
     {
-        if (!OcrConstants.AllowedContentTypes.Contains(file.ContentType))
+        if (file.Value is null)
+            return BadRequest("Invalid file");
+
+        if (!OcrConstants.AllowedImageContentTypes.Contains(file.Value.ContentType))
             return BadRequest("Invalid content type");
 
-        if (file.Length > FileConstants.TenMbInBytes)
+        if (file.Value.Length > FileConstants.TenMbInBytes)
             return BadRequest("File length is greater than 10 MB");
 
-        var response = await _ocrService.GetTextFromImage(file.OpenReadStream(), cancellationToken);
+        var response = await _ocrService.GetTextFromImage(file.Value.OpenReadStream(), cancellationToken);
+        if (string.IsNullOrWhiteSpace(response.Text))
+            return NoContent();
+
         return Ok(response);
     }
 }
