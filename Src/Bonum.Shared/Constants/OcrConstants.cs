@@ -2,7 +2,7 @@ namespace Bonum.Shared.Constants;
 
 public readonly struct OcrConstants
 {
-    public static readonly string[] AllowedImageContentTypes =
+    public static readonly string[] AllowedContentTypes =
     {
         "image/avif",
         "image/jpeg",

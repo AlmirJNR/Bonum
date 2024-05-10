@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMassTransit(x =>
 {
-    x.AddRequestClient<OcrMessage>();
+    x.AddRequestClient<OcrMessage>(RequestTimeout.After(s:10));
     x.UsingBonumRabbitMq(builder.Configuration);
 });
 builder.Services.AddTransient<IAmqpClient<OcrMessage, OcrMessageResult>, OcrClient>();

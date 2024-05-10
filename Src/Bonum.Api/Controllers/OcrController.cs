@@ -19,7 +19,7 @@ public class OcrController : ControllerBase
 
     [ProducesResponseType(typeof(OcrMessageResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [HttpPost("image")]
+    [HttpPost]
     public async Task<IActionResult> GetImageText(
         [FromForm] WrapperDto<IFormFile> file,
         CancellationToken cancellationToken
@@ -28,7 +28,7 @@ public class OcrController : ControllerBase
         if (file.Value is null)
             return BadRequest("Invalid file");
 
-        if (!OcrConstants.AllowedImageContentTypes.Contains(file.Value.ContentType))
+        if (!OcrConstants.AllowedContentTypes.Contains(file.Value.ContentType))
             return BadRequest("Invalid content type");
 
         if (file.Value.Length > FileConstants.TenMbInBytes)

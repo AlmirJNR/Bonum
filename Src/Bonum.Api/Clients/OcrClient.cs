@@ -13,17 +13,9 @@ public class OcrClient : IAmqpClient<OcrMessage, OcrMessageResult>
         _client = client;
     }
 
-    public async Task<OcrMessageResult> Request(
-        OcrMessage message,
-        CancellationToken cancellationToken,
-        int timeout = 10
-    )
+    public async Task<OcrMessageResult> Request(OcrMessage message, CancellationToken cancellationToken)
     {
-        var response = await _client.GetResponse<OcrMessageResult>(
-            message,
-            cancellationToken,
-            TimeSpan.FromSeconds(timeout)
-        );
+        var response = await _client.GetResponse<OcrMessageResult>(message, cancellationToken);
         return response.Message;
     }
 }
