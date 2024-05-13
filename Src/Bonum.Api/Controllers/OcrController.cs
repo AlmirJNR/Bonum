@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bonum.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class OcrController : ControllerBase
 {
     private readonly IOcrService _ocrService;
