@@ -1,28 +1,28 @@
 services:
+    rabbitmq:
+        image: rabbitmq:3-alpine
+        volumes:
+            - ./Src/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:r
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+
     bonum-ocr:
         build:
             context: ./Src
-            dockerfile: Bonum.Ocr/Dockerfile
+            dockerfile: Bonum.Ocr.Dockerfile
         environment:
             DOTNET_ENVIRONMENT: Container
         depends_on:
             rabbitmq:
                 condition: service_started
 
-    rabbitmq:
-        image: rabbitmq:3-alpine
-        volumes:
-            - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:r
-        ports:
-            - "15672:15672"
-            - "5672:5672"
-
     bonum-api:
         build:
             context: ./Src
-            dockerfile: Bonum.Api/Dockerfile
+            dockerfile: Bonum.Api.Dockerfile
         environment:
-            DOTNET_ENVIRONMENT: Container
+            ASPNETCORE_ENVIRONMENT: Container
         ports:
             - "5000:80"
         depends_on:
