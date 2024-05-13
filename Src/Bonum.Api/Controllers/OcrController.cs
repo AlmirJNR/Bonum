@@ -22,6 +22,7 @@ public class OcrController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> GetImageText(
         [FromForm] WrapperDto<IFormFile> file,
+        [FromForm] string[] languages,
         CancellationToken cancellationToken
     )
     {
@@ -34,7 +35,7 @@ public class OcrController : ControllerBase
         if (file.Value.Length > FileConstants.TenMbInBytes)
             return BadRequest("File length is greater than 10 MB");
 
-        var response = await _ocrService.GetTextFromImage(file.Value.OpenReadStream(), cancellationToken);
+        var response = await _ocrService.GetTextFromImage(file.Value.OpenReadStream(), cancellationToken, languages);
         if (string.IsNullOrWhiteSpace(response.Text))
             return NoContent();
 

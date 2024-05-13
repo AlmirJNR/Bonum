@@ -12,12 +12,16 @@ public class OcrService : IOcrService
         _ocrClient = ocrClient;
     }
 
-    public async Task<OcrMessageResult> GetTextFromImage(Stream stream, CancellationToken cancellationToken)
+    public async Task<OcrMessageResult> GetTextFromImage(
+        Stream stream,
+        CancellationToken cancellationToken,
+        params string[] languages
+    )
     {
         await using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream, cancellationToken);
         var fileBytes = memoryStream.ToArray();
-        var response = await _ocrClient.Request(new OcrMessage(fileBytes), cancellationToken);
+        var response = await _ocrClient.Request(new OcrMessage(fileBytes, languages), cancellationToken);
         return response;
     }
 }
