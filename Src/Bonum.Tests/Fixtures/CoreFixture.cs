@@ -5,12 +5,12 @@ using DotNet.Testcontainers.Networks;
 
 namespace Bonum.Tests.Fixtures;
 
-public class RabbitMqFixture : IAsyncLifetime
+public class CoreFixture : IAsyncLifetime
 {
     public INetwork Network { get; }
     private IContainer RabbitMqContainer { get; }
 
-    public RabbitMqFixture()
+    public CoreFixture()
     {
         Network = new NetworkBuilder()
             .WithName(Guid.NewGuid().ToString())

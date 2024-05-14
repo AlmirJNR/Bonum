@@ -1,22 +1,19 @@
 using System.Net.Http.Json;
-using Bonum.Api;
 using Bonum.Contracts.Messages;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Images;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net.Http.Headers;
 using Bonum.Tests.Fixtures;
+using Bonum.Tests.Helpers;
 
 namespace Bonum.Tests;
 
-public class UnitTest1 : IClassFixture<RabbitMqFixture>, IAsyncLifetime
+public class OcrApiTests : IClassFixture<CoreFixture>, IAsyncLifetime
 {
     private readonly IFutureDockerImage _ocrImage;
     private readonly IContainer _ocrContainer;
 
-    public UnitTest1(RabbitMqFixture rabbitMqFixture)
+    public OcrApiTests(CoreFixture coreFixture)
     {
         _ocrImage = new ImageFromDockerfileBuilder()
             .WithDockerfileDirectory(CommonDirectoryPath.GetSolutionDirectory(), string.Empty)
@@ -26,44 +23,36 @@ public class UnitTest1 : IClassFixture<RabbitMqFixture>, IAsyncLifetime
         _ocrContainer = new ContainerBuilder()
             .WithImage(_ocrImage)
             .WithEnvironment("DOTNET_ENVIRONMENT", "Container")
-            .WithNetwork(rabbitMqFixture.Network)
+            .WithNetwork(coreFixture.Network)
             .Build();
     }
 
     [Theory]
     [InlineData("image.png", "Almir Júnior")]
     [InlineData("image2.png", "Almir A. F. Junior")]
-    public async Task Test1(string fileName, string expectedValue)
+    public async Task SendImageToApi_ShouldContainExpectedText(string fileName, string expectedText)
     {
-        var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-        {
-            builder.UseEnvironment("Development");
-        });
-        using var client = factory.CreateClient();
-
-        var workingDirectory = Directory.GetCurrentDirectory();
-        var binariesDirectory = Directory.GetParent(workingDirectory)!.Parent!.FullName;
-        var projectDirectory = Directory.GetParent(binariesDirectory)!.FullName;
-
-        var filePath = Path.Combine(projectDirectory, "Assets", fileName);
-        var file = new FileInfo(filePath);
-
-        using var memoryStream = new MemoryStream();
-        await file.OpenRead().CopyToAsync(memoryStream);
-
-        var fileByteContent = new ByteArrayContent(memoryStream.ToArray());
-        fileByteContent.Headers.ContentType = MediaTypeHeaderValue.Parse(
-            $"image/{file.Extension.Replace(".", string.Empty)}"
-        );
+        // Arrange
+        var assetsDirectory = DirectoryHelper.GetAssetsDirectory();
+        var filePath = Path.Combine(assetsDirectory, fileName);
+        var file = FileHelper.GetFileInfo(filePath);
+        using var memoryStream = await FileHelper.CopyFileToMemory(file);
 
         var formData = new MultipartFormDataContent();
-        formData.Add(fileByteContent, "Value", file.Name);
+        var byteArrayContent = MultipartFormDataHelper.CreateByteArrayContent(
+            memoryStream,
+            FileHelper.GetFileContentType(file)
+        );
+        formData.Add(byteArrayContent, "value", file.Name);
         formData.Add(new StringContent("por"), "languages");
+        using var client = WebApplicationFactoryHelper.CreateDefaultClient();
 
+        // Act
         using var response = await client.PostAsync("/api/v1/Ocr", formData);
         var result = await response.Content.ReadFromJsonAsync<OcrMessageResult>();
 
-        Assert.Contains(expectedValue, result!.Text);
+        // Assert
+        Assert.Contains(expectedText, result!.Text);
     }
 
     public async Task InitializeAsync()
