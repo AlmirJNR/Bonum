@@ -28,9 +28,13 @@ public class OcrApiTests : IClassFixture<CoreFixture>, IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("image.png", "Almir Júnior")]
-    [InlineData("image2.png", "Almir A. F. Junior")]
-    public async Task SendImageToApi_ShouldContainExpectedText(string fileName, string expectedText)
+    [InlineData("image.png", "Almir Júnior", "por")]
+    [InlineData("image2.png", "Almir A. F. Junior", "eng")]
+    public async Task SendImageToApi_ShouldContainExpectedText(
+        string fileName,
+        string expectedText,
+        params string[] languages
+    )
     {
         // Arrange
         var assetsDirectory = DirectoryHelper.GetAssetsDirectory();
@@ -44,7 +48,9 @@ public class OcrApiTests : IClassFixture<CoreFixture>, IAsyncLifetime
             FileHelper.GetFileContentType(file)
         );
         formData.Add(byteArrayContent, "value", file.Name);
-        formData.Add(new StringContent("por"), "languages");
+        foreach (var language in languages)
+            formData.Add(new StringContent(language), "languages");
+
         using var client = WebApplicationFactoryHelper.CreateDefaultClient();
 
         // Act
