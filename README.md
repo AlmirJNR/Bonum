@@ -19,3 +19,8 @@ Steps:
 Pre-requisites (development):
 - Dotnet SDK 6.0.+
 - Any IDE that works with Dotnet
+
+Steps:
+1. Run `docker compose up rabbitmq`
+2. Start the `Bonum.Ocr` project
+3. Start the `Bonum.Api` project
