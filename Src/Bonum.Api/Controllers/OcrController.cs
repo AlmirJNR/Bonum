@@ -27,8 +27,8 @@ public class OcrController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        if (file.Value is null)
-            return BadRequest("Invalid file");
+        if (file.Value is null || file.Value.Length == 0)
+            return BadRequest("Must provide a file greater than 0 bytes");
 
         if (!OcrConstants.AllowedContentTypes.Contains(file.Value.ContentType))
             return BadRequest("Invalid content type");
