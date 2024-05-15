@@ -17,9 +17,10 @@ public class OcrController : ControllerBase
         _ocrService = ocrService;
     }
 
+    [HttpPost]
     [ProducesResponseType(typeof(OcrMessageResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetImageText(
         [FromForm] WrapperDto<IFormFile> file,
         [FromForm] string[] languages,
